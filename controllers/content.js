@@ -33,14 +33,14 @@ exports.createPost = (req, res, next) => {
 
 // Récupération des posts
 exports.getAllContents = (req, res, next) => {
-    const connection = Db.get();    
-    let allContents = "SELECT post.*, user.username FROM post JOIN user ON user.id = user_id ORDER BY date DESC LIMIT ?, ?" ;
+    const connection = Db.get();
+    let allContents = "SELECT post.*, user.username FROM post JOIN user ON user.id = user_id ORDER BY date DESC LIMIT ?, ?";
     let offset = [parseInt(req.query.offset ?? 0), parseInt(req.query.limit ?? 5)];
     allContents = connection.format(allContents, offset);
     let contentQuery = connection.promise().query(allContents);
     let count = "SELECT COUNT(*) AS counter FROM post";
     const countQuery = connection.promise().query(count);
-    Promise.all([ contentQuery, countQuery ])
+    Promise.all([contentQuery, countQuery])
         .then((data) => {
             console.log(data)
             console.log(data[1][0][0].counter)
@@ -58,13 +58,28 @@ exports.getAllContents = (req, res, next) => {
 };
 
 exports.deleteContents = (req, res, next) => {
-    const connection = Db.get(); 
-    let deleteContents = "DELETE FROM `post` WHERE `id` = ? " ;
+    const connection = Db.get();
+    let deleteContents = "DELETE FROM `post` WHERE `id` = ? ";
     let id = parseInt(req.query.id);
     console.log(req.query)
     deleteContents = connection.format(deleteContents, id);
     console.log(deleteContents)
     connection.promise().query(deleteContents)
-    .then(() => res.status(200).json({ Message: 'post supprimé', status: true }))
-    .catch(error => res.status(500).json({ error }));
+        .then(() => res.status(200).json({ Message: 'post supprimé', status: true }))
+        .catch(error => res.status(500).json({ error }));
+}
+
+exports.deleteCount = (req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+    const connection = Db.get();
+    let deleteCount = "DELETE FROM `user` WHERE `id` = ? ";
+    let id = parseInt(req.query.id);
+    console.log(req.query)
+    deleteCount = connection.format(deleteCount, id);
+    console.log(deleteCount)
+    connection.promise().query(deleteCount)
+        .then(() => res.status(200).json({ Message: 'compte supprimé', status: true }))
+        .catch(error => res.status(500).json({ error }));
 }
