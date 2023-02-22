@@ -27,7 +27,7 @@ exports.signup = (req, res, next) => {
           bcrypt.hash(user.password, 10)
             .then(hash => {
               user.password = hash
-              let sql = "INSERT INTO `user`(last_name, first_name, password, username, email) VALUES (?,?,?,?,?) ";
+              let sql = "INSERT INTO `user`(last_name, first_name, password, username, email, moderateur) VALUES (?,?,?,?,?,0) ";
               const inserts = [user.lastname, user.firstName, user.password, user.userName, user.email];
               sql = connection.format(sql, inserts);
               connection.promise().query(sql)
@@ -50,6 +50,7 @@ exports.login = (req, res, next) => {
   loginQuery = connection.format(loginQuery, [req.body.email]);
   connection.promise().query(loginQuery)
     .then(([rows, fields]) => {
+      //console.log(rows[0].moderateur)
       const user = rows[0];
       //console.log(req.body.email)
       if (!user) {
@@ -63,7 +64,7 @@ exports.login = (req, res, next) => {
           res.status(200).json({
             token: jwt.sign(
               { id: user.id },
-              process.env.KEY,
+              process.env.TOKEN,
               { expiresIn: '24h' }
             ),
             user: user,

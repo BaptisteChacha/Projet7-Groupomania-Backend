@@ -34,7 +34,7 @@ exports.createPost = (req, res, next) => {
 // Récupération des posts
 exports.getAllContents = (req, res, next) => {
     const connection = Db.get();
-    let allContents = "SELECT post.*, user.username FROM post JOIN user ON user.id = user_id ORDER BY date DESC LIMIT ?, ?";
+    let allContents = "SELECT post.*, user.username, user.moderateur FROM post JOIN user ON user.id = user_id ORDER BY date DESC LIMIT ?, ?";
     let offset = [parseInt(req.query.offset ?? 0), parseInt(req.query.limit ?? 5)];
     allContents = connection.format(allContents, offset);
     let contentQuery = connection.promise().query(allContents);
